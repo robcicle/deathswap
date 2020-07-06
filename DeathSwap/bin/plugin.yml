@@ -1,0 +1,14 @@
+name: DeathSwap
+version: 1.0
+author: Robcicle
+main: me.robcicle.deathswap.Main
+description: Commands made by Robcicle
+
+commands:
+  swap:
+   aliases: [timedswap]
+   description: Swaps players positions after a certain amount of time.
+   usage: swap, timedswap
+  stopswap:
+   description: Stops players being swapped.
+   usage: stopswap
