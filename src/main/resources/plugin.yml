@@ -1,0 +1,14 @@
+name: DeathSwap
+version: 1.0.1
+author: Robcicle
+main: dev.robcicle.deathswap.Main
+description: DeathSwap is a light mini-game where players are swapped every 5 minutes and have to leave each other in a near-death state.
+
+commands:
+  swap:
+   aliases: [timedswap]
+   description: Swaps players positions after a certain amount of time.
+   usage: swap, timedswap
+  stopswap:
+   description: Stops players being swapped.
+   usage: stopswap
