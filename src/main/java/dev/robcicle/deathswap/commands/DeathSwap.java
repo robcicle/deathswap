@@ -18,14 +18,16 @@ import org.bukkit.util.Vector;
 
 public class DeathSwap extends BukkitRunnable implements CommandExecutor {
     
-    public float timer = 60;
-    public float seconds;
-    public boolean running = false;
+    private final Main plugin;
+    private float timer = 60;
+    private float seconds;
+    private boolean running = false;
     
-    public Player p1;
-    public Player p2;
+    private Player p1;
+    private Player p2;
     
     public DeathSwap(Main plugin) {
+        this.plugin = plugin;
         plugin.getCommand("swap").setExecutor(this);
     }
     
@@ -63,10 +65,15 @@ public class DeathSwap extends BukkitRunnable implements CommandExecutor {
             return true;
         }
         
+        StartGame();
+        return true;
+    }
+    
+    private void StartGame() {
         running = true;
         seconds = timer;
         Bukkit.broadcast(Component.text("§lYour timer has now started, Good Luck!"));
-        return true;
+        runTaskTimer(plugin, 0, 20); // Schedule the task to run every second
     }
     
     @Override
@@ -74,16 +81,7 @@ public class DeathSwap extends BukkitRunnable implements CommandExecutor {
         if (!running) return;
         
         if (p1.isDead() || p2.isDead()) {
-            running = false;
-            Player winner = p1.isDead() ? p2 : p1;
-            Bukkit.broadcast(Component.text(ChatColor.GREEN + "" + ChatColor.BOLD + winner.getName() + " is the winner of" + ChatColor.RED + "" + ChatColor.BOLD + " Death Swap" + ChatColor.GREEN + "!"));
-			winner.showTitle(
-				Title.title(
-					Component.text(ChatColor.GREEN + "" + ChatColor.BOLD + "Winner!"),
-					Component.text(ChatColor.GREEN + "" + ChatColor.BOLD + winner.getName() + " is the Winner!")
-				)
-			);
-			Win(winner);
+            EndGame();
             return;
         }
         
@@ -91,15 +89,28 @@ public class DeathSwap extends BukkitRunnable implements CommandExecutor {
         if (seconds <= 0) {
             seconds = timer;
             Bukkit.broadcast(Component.text(ChatColor.DARK_RED + "" + ChatColor.BOLD + "SWAPPING!"));
-            Swap();
+            SwapPlayers();
         } else if (seconds <= 10) {
             Bukkit.broadcast(Component.text(ChatColor.DARK_RED + "" + ChatColor.BOLD + "SWAPPING IN " + (int) seconds + "!"));
         }
     }
     
-    private void Win(Player pWin) {
-        Location loc = pWin.getLocation();
-        World world = pWin.getWorld();
+    private void EndGame() {
+        running = false;
+        Player winner = p1.isDead() ? p2 : p1;
+        Bukkit.broadcast(Component.text(ChatColor.GREEN + "" + ChatColor.BOLD + winner.getName() + " is the winner of" + ChatColor.RED + "" + ChatColor.BOLD + " Death Swap" + ChatColor.GREEN + "!"));
+        winner.showTitle(
+            Title.title(
+                Component.text(ChatColor.GREEN + "" + ChatColor.BOLD + "Winner!"),
+                Component.text(ChatColor.GREEN + "" + ChatColor.BOLD + winner.getName() + " is the Winner!")
+            )
+        );
+        CelebrateWin(winner);
+    }
+    
+    private void CelebrateWin(Player winner) {
+        Location loc = winner.getLocation();
+        World world = winner.getWorld();
         int diameter = 4;
         int fireworkAmount = 10;
 
@@ -108,10 +119,10 @@ public class DeathSwap extends BukkitRunnable implements CommandExecutor {
             world.spawnEntity(newLocation, EntityType.FIREWORK_ROCKET);
         }
         
-        pWin.playSound(pWin.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
+        winner.playSound(winner.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
     }
     
-    private void Swap() {
+    private void SwapPlayers() {
         Location l1 = p1.getLocation();
         Location l2 = p2.getLocation();
         
@@ -119,5 +130,13 @@ public class DeathSwap extends BukkitRunnable implements CommandExecutor {
         p1.playSound(l2, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0);
         p2.teleport(l1);
         p2.playSound(l1, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0);
+    }
+
+    public boolean GetRunning() {
+        return running;
+    }
+
+    public void StopGame() {
+        running = false;
     }
 }

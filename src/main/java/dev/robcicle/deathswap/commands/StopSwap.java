@@ -26,10 +26,10 @@ public class StopSwap implements CommandExecutor {
         
         Player player = (Player) sender;
         
-        if (!swap.running) {
+        if (!swap.GetRunning()) {
             player.sendMessage("There isn't currently a swap occurring.");
         } else {
-            swap.running = false;
+            swap.StopGame();
             Bukkit.broadcast(Component.text("Swap has been stopped!"));
         }
         return true;
